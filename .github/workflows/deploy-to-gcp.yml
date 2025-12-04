@@ -2,25 +2,33 @@ name: Deploy to GCS
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write          # ← Это важно!
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v1
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          project_id: ${{ secrets.GCP_PROJECT }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to GCS
         run: |
-          gsutil -m rsync -r -x "\.git/.*" ./ gs://$GCS_BUCKET
-          gsutil web set -m index.html -e 404.html gs://$GCS_BUCKET
-        env:
-          GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
+          gsutil -m rsync -d -r . gs://${{ env.GCS_BUCKET }}
+          gsutil web set -m index.html -e 404.html gs://${{ env.GCS_BUCKET }}
+
+      - name: Invalidate cache (optional)
+        run: |
+          gsutil setmeta -r -h "Cache-Control: no-cache, must-revalidate" gs://${{ env.GCS_BUCKET }}/**
