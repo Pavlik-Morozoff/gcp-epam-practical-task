@@ -31,4 +31,4 @@ jobs:
 
       - name: Invalidate cache (optional)
         run: |
-          gsutil setmeta -r -h "Cache-Control: no-cache, must-revalidate" gs://${{ var.GCS_BUCKET }}/**
+          gsutil setmeta -r -h "Cache-Control: no-cache, must-revalidate" gs://${{ vars.GCS_BUCKET }}/**
