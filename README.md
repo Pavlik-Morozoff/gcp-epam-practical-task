@@ -1,4 +1,6 @@
 # gcp-epam-practical-task 
+solomatin.pavel@gmail.com
+
 https://my-supa-site.jedimasters.net/
 
 <img width="1917" height="940" alt="image" src="https://github.com/user-attachments/assets/0e62ff55-7f0b-4c6a-9c9d-22f177da16fe" />
